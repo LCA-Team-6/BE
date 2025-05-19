@@ -3,7 +3,6 @@ package com.project.mini.user.service;
 import com.project.mini.auth.dto.SignUpDto;
 import com.project.mini.user.entity.User;
 import com.project.mini.user.repository.UserRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

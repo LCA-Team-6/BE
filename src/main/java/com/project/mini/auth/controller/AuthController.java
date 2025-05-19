@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
@@ -40,8 +39,6 @@ public class AuthController {
             User user = (User) authentication.getPrincipal();
             String email = user.getEmail();
             String name = user.getName();
-
-            log.debug(name);
 
             String token = jwtUtil.generateToken(email, name);
             return ResponseEntity.ok(Response.success("Token 발급 완료.", new TokenDto(token)));
