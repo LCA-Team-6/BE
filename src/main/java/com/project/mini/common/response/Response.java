@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class Response<T> {
     private int status;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

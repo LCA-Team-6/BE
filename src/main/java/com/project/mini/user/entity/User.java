@@ -1,5 +1,6 @@
 package com.project.mini.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,7 @@ public class User implements UserDetails {
     private String name;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Override

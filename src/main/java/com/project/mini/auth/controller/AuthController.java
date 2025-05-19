@@ -62,4 +62,16 @@ public class AuthController {
         userService.signup(signUpDto);
         return ResponseEntity.ok(Response.success("회원가입 성공", null));
     }
+
+    @PostMapping("/verify/email")
+    public ResponseEntity<?> verifyEmail(@RequestBody String email) {
+        if (userService.isEmailDuplicate(email)) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Response.fail(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."));
+        } else {
+            return ResponseEntity.ok(Response.success("사용 가능한 이메일입니다.", null));
+        }
+    }
 }

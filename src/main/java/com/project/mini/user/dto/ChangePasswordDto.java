@@ -1,4 +1,4 @@
-package com.project.mini.user;
+package com.project.mini.user.dto;
 
 public class ChangePasswordDto {
     private String oldPassword;

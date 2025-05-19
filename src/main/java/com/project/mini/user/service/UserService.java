@@ -16,8 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-
-class UserService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,14 +29,14 @@ class UserService {
     public void updateUserInfo(UserUpdateDto updateDto) {
         User user = getCurrentAuthenticatedUser();
         user.setName(updateDto.getName());
-        user.setEmail(updateDto.getEmail());
+        // user.setEmail(updateDto.getEmail());
         userRepository.save(user);
     }
 
     public void changePassword(ChangePasswordDto dto) {
         User user = getCurrentAuthenticatedUser();
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("±âÁ¸ ºñ¹Ğ¹øÈ£°¡ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù.");
+            throw new IllegalArgumentException("ê¸°ì¡´ ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
         }
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
@@ -52,6 +51,22 @@ class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("»ç¿ëÀÚ¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù."));
+                .orElseThrow(() -> new UsernameNotFoundException("ì‚¬ìš©ìë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
+    }
+
+    public boolean isEmailDuplicate(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public void signup(SignUpDto signUpDto) {
+        String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
+
+        User user = User.builder()
+                .email(signUpDto.getEmail())
+                .name(signUpDto.getName())
+                .password(encodedPassword)
+                .build();
+
+        userRepository.save(user);
     }
 }

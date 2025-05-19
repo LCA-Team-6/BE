@@ -1,4 +1,6 @@
-package com.project.mini.user;
+package com.project.mini.user.dto;
+
+import com.project.mini.user.entity.User;
 
 public class UserResponseDto {
     private Long userId;

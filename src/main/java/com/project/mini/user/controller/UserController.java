@@ -1,11 +1,13 @@
-// JavaScript source code
 package com.project.mini.user.controller;
-
-import com.project.mini.common.Response;
+import com.project.mini.common.response.Response;
 import com.project.mini.user.dto.*;
+import com.project.mini.user.entity.User;
 import com.project.mini.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,30 +17,37 @@ public class UserController {
 
     private final UserService userService;
 
-    // READ: À¯Àú Á¤º¸ Á¶È¸ (¸¶ÀÌÆäÀÌÁö µî)
+    // READ: ìœ ì € ì •ë³´ ì¡°íšŒ (ë§ˆì´í˜ì´ì§€ ë“±)
     @GetMapping
-    public ResponseEntity<Response<UserResponseDto>> getUserInfo() {
-        return ResponseEntity.ok(Response.success("À¯Àú Á¤º¸ Á¶È¸ ¼º°ø", userService.getCurrentUser()));
+    public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(Response.success(null, new UserResponseDto(user)));
     }
 
-    // UPDATE: À¯Àú Á¤º¸ ¼öÁ¤ (ÀÌ¸§, ÀÌ¸ŞÀÏ µî)
+    // UPDATE: ìœ ì € ì •ë³´ ìˆ˜ì • (ì´ë¦„, ì´ë©”ì¼ ë“±)
     @PatchMapping
     public ResponseEntity<Response<Void>> updateUserInfo(@RequestBody UserUpdateDto updateDto) {
         userService.updateUserInfo(updateDto);
-        return ResponseEntity.ok(Response.success("¼öÁ¤µÈ °ª", null));
+        return ResponseEntity.ok(Response.success("ìœ ì € ì •ë³´ ìˆ˜ì • ì™„ë£Œ.", null));
     }
 
-    // UPDATE: ºñ¹Ğ¹øÈ£ º¯°æ
+    // UPDATE: ë¹„ë°€ë²ˆí˜¸ ë³€ê²½
     @PostMapping("/password")
     public ResponseEntity<Response<Void>> changePassword(@RequestBody ChangePasswordDto dto) {
-        userService.changePassword(dto);
-        return ResponseEntity.ok(Response.success("ºñ¹Ğ¹øÈ£ º¯°æ ¿Ï·á", null));
+        try {
+            userService.changePassword(dto);
+            return ResponseEntity.ok(Response.success("ë¹„ë°€ë²ˆí˜¸ ë³€ê²½ ì™„ë£Œ.", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Response.fail(HttpStatus.CONFLICT, e.getMessage()));
+        }
     }
 
-    // DELETE: À¯Àú »èÁ¦
+    // DELETE: ìœ ì € ì‚­ì œ
     @DeleteMapping
     public ResponseEntity<Response<Void>> deleteUser() {
         userService.deleteCurrentUser();
-        return ResponseEntity.ok(Response.success("»èÁ¦µÈ °ª", null));
+        return ResponseEntity.ok(Response.success("ìœ ì € ì‚­ì œ ì™„ë£Œ.", null));
     }
 }
