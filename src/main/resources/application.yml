@@ -1,0 +1,23 @@
+spring:
+  profile:
+    active: dev
+  application:
+    name: mini
+  datasource:
+    url: jdbc:mariadb://15.164.171.214:3306/mini
+    username: mini
+    password: 1234
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  default-produces-media-type: application/json
