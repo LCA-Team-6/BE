@@ -63,7 +63,7 @@ public class AuthController {
         return ResponseEntity.ok(Response.success("회원가입 성공", null));
     }
 
-    @PostMapping("/verify/email")
+    @PostMapping("/email")
     public ResponseEntity<?> verifyEmail(@RequestBody String email) {
         if (userService.isEmailDuplicate(email)) {
             return ResponseEntity
