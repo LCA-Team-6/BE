@@ -31,9 +31,8 @@ public class PresetPromptController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePrompt(@PathVariable Long id, @RequestBody PresetPromptRequestDto dto) {
-        service.updatePrompt(id, dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PresetPromptResponseDto> updatePrompt(@PathVariable Long id, @RequestBody PresetPromptRequestDto dto) {
+        return ResponseEntity.ok(service.updatePrompt(id, dto));
     }
 
     @DeleteMapping("/{id}")
