@@ -26,11 +26,12 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
-    public void updateUserInfo(UserUpdateDto updateDto) {
+    public UserResponseDto updateUserInfo(UserUpdateDto updateDto) {
         User user = getCurrentAuthenticatedUser();
         user.setName(updateDto.getName());
         // user.setEmail(updateDto.getEmail());
         userRepository.save(user);
+        return new UserResponseDto(getCurrentAuthenticatedUser());
     }
 
     public void changePassword(ChangePasswordDto dto) {

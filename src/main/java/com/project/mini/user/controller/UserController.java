@@ -25,9 +25,8 @@ public class UserController {
 
     // UPDATE: 유저 정보 수정 (이름, 이메일 등)
     @PatchMapping
-    public ResponseEntity<Response<Void>> updateUserInfo(@RequestBody UserUpdateDto updateDto) {
-        userService.updateUserInfo(updateDto);
-        return ResponseEntity.ok(Response.success("유저 정보 수정 완료.", null));
+    public ResponseEntity<?> updateUserInfo(@RequestBody UserUpdateDto updateDto) {
+        return ResponseEntity.ok(Response.success("유저 정보 수정 완료.", userService.updateUserInfo(updateDto)));
     }
 
     // UPDATE: 비밀번호 변경
