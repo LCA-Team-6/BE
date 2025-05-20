@@ -30,7 +30,7 @@ public class UserController {
     }
 
     // UPDATE: 비밀번호 변경
-    @PostMapping("/password")
+    @PatchMapping("/password")
     public ResponseEntity<Response<Void>> changePassword(@RequestBody ChangePasswordDto dto) {
         try {
             userService.changePassword(dto);
