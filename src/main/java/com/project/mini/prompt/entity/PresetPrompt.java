@@ -1,7 +1,7 @@
 package com.project.mini.prompt.entity; 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime; // createdAt을 위해 추가
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "preset_prompt")
@@ -14,22 +14,22 @@ public class PresetPrompt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "perset_prompt_id") 
+    @Column(name = "preset_prompt_id")
     private Long presetPromptId;
 
     @Column(name = "user_id", nullable = false) 
     private Long userId;
 
-    @Column(name = "tone_id", nullable = false) 
+    @Column(name = "tone_id")
     private Long toneId;
 
-    @Column(name = "personality_id", nullable = false) 
+    @Column(name = "personality_id")
     private Long personalityId;
 
-    @Column(name = "style_id", nullable = false) 
+    @Column(name = "style_id")
     private Long styleId;
 
-    @Column(name = "content_id", nullable = false) 
+    @Column(name = "content_id")
     private Long contentId;
 
     @Column(nullable = false) 

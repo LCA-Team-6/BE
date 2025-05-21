@@ -1,13 +1,12 @@
-package com.project.mini.prompt.service; // Æú´õ ±¸Á¶ º¯°æ¿¡ ¸ÂÃç service ÇÏÀ§·Î ÀÌµ¿
+package com.project.mini.prompt.service; // í´ë” êµ¬ì¡° ë³€ê²½ì— ë§ì¶° service í•˜ìœ„ë¡œ ì´ë™
 
 import com.project.mini.prompt.dto.*;
-import com.project.mini.prompt.entity.PresetPrompt; // entity ÆĞÅ°Áö º¯°æ
-import com.project.mini.prompt.repository.PresetPromptRepository; // repository ÆĞÅ°Áö º¯°æ
+import com.project.mini.prompt.entity.PresetPrompt; // entity íŒ¨í‚¤ì§€ ë³€ê²½
+import com.project.mini.prompt.repository.PresetPromptRepository; // repository íŒ¨í‚¤ì§€ ë³€ê²½
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +18,8 @@ public class PresetPromptService {
     private final PresetPromptRepository repository;
 
     @Transactional(readOnly = true)
-    public List<PresetPromptResponseDto> getAllPrompts(Long userId) { // userId ÀÎÀÚ Ãß°¡
-        return repository.findByUserId(userId).stream() // userId·Î ÇÊÅÍ¸µ
+    public List<PresetPromptResponseDto> getAllPrompts(Long userId) { // userId ì¸ì ì¶”ê°€
+        return repository.findByUserId(userId).stream() // userIdë¡œ í•„í„°ë§
                 .map(prompt -> PresetPromptResponseDto.builder()
                         .presetPromptId(prompt.getPresetPromptId())
                         .userId(prompt.getUserId())
@@ -35,15 +34,15 @@ public class PresetPromptService {
     }
 
     @Transactional(readOnly = true)
-    public PresetPromptResponseDto getPrompt(Long presetPromptId) { // id -> presetPromptId º¯°æ
+    public PresetPromptResponseDto getPrompt(Long presetPromptId) {
         PresetPrompt prompt;
         try {
-            prompt = repository.findByPresetPromptId(presetPromptId) // findById -> findByPresetPromptId
-                    .orElseThrow(() -> new EntityNotFoundException("ÇÁ¸®¼ÂÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.")); // ¸Ş½ÃÁö º¯°æ
-        } catch (EntityNotFoundException e) {
-            // Service °èÃş¿¡¼­ Æ¯Á¤ ¿¹¿Ü¸¦ Àâ°í RuntimeExceptionÀ¸·Î ´Ù½Ã ´øÁı´Ï´Ù.
-            // ½ÇÁ¦ ¾ÖÇÃ¸®ÄÉÀÌ¼Ç¿¡¼­´Â Custom ExceptionÀ» Á¤ÀÇÇÏ¿© »ç¿ëÇÏ´Â °ÍÀÌ ÁÁ½À´Ï´Ù.
-            throw new RuntimeException("ÇÁ¸®¼Â Á¶È¸ ½ÇÆĞ: " + e.getMessage(), e);
+            prompt = repository.findByPresetPromptId(presetPromptId)
+                    .orElseThrow(() -> new IllegalArgumentException("í”„ë¦¬ì…‹ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.")); // ë©”ì‹œì§€ ë³€ê²½
+        } catch (IllegalArgumentException e) {
+            // Service ê³„ì¸µì—ì„œ íŠ¹ì • ì˜ˆì™¸ë¥¼ ì¡ê³  RuntimeExceptionìœ¼ë¡œ ë‹¤ì‹œ ë˜ì§‘ë‹ˆë‹¤.
+            // ì‹¤ì œ ì• í”Œë¦¬ì¼€ì´ì…˜ì—ì„œëŠ” Custom Exceptionì„ ì •ì˜í•˜ì—¬ ì‚¬ìš©í•˜ëŠ” ê²ƒì´ ì¢‹ìŠµë‹ˆë‹¤.
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         return PresetPromptResponseDto.builder()
@@ -59,31 +58,31 @@ public class PresetPromptService {
     }
 
     @Transactional
-    public void createPrompt(PresetPromptRequestDto dto, Long userId) { // userId ÀÎÀÚ Ãß°¡
+    public void createPrompt(PresetPromptRequestDto dto, Long userId) { // userId ì¸ì ì¶”ê°€
         try {
             PresetPrompt prompt = PresetPrompt.builder()
-                    .userId(userId) // @AuthenticationPrincipal¿¡¼­ ¹ŞÀº userId ¼³Á¤
+                    .userId(userId) // @AuthenticationPrincipalì—ì„œ ë°›ì€ userId ì„¤ì •
                     .toneId(dto.getToneId())
                     .personalityId(dto.getPersonalityId())
                     .styleId(dto.getStyleId())
                     .contentId(dto.getContentId())
                     .name(dto.getName())
-                    .createdAt(LocalDateTime.now()) // createdAt ¼³Á¤
+                    .createdAt(LocalDateTime.now()) // createdAt ì„¤ì •
                     .build();
             repository.save(prompt);
         } catch (Exception e) {
-            throw new RuntimeException("ÇÁ¸®¼Â »ı¼º ½ÇÆĞ: " + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @Transactional
-    public PresetPromptResponseDto updatePrompt(Long presetPromptId, PresetPromptRequestDto dto) { // id -> presetPromptId º¯°æ
+    public PresetPromptResponseDto updatePrompt(Long presetPromptId, PresetPromptRequestDto dto) {
         PresetPrompt prompt;
         try {
-            prompt = repository.findByPresetPromptId(presetPromptId) // findById -> findByPresetPromptId
-                    .orElseThrow(() -> new EntityNotFoundException("ÇÁ¸®¼ÂÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.")); // ¸Ş½ÃÁö º¯°æ
-        } catch (EntityNotFoundException e) {
-            throw new RuntimeException("ÇÁ¸®¼Â ¾÷µ¥ÀÌÆ® ½ÇÆĞ: " + e.getMessage(), e);
+            prompt = repository.findByPresetPromptId(presetPromptId)
+                    .orElseThrow(() -> new IllegalArgumentException("í”„ë¦¬ì…‹ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("í”„ë¦¬ì…‹ ì—…ë°ì´íŠ¸ ì‹¤íŒ¨: " + e.getMessage(), e);
         }
 
         prompt.setToneId(dto.getToneId());
@@ -106,15 +105,13 @@ public class PresetPromptService {
     }
 
     @Transactional
-    public void deletePrompt(Long presetPromptId) { // id -> presetPromptId º¯°æ
+    public void deletePrompt(Long presetPromptId) {
         try {
-            repository.findByPresetPromptId(presetPromptId) // »èÁ¦ Àü¿¡ Á¸Àç ¿©ºÎ¸¦ È®ÀÎ
-                    .orElseThrow(() -> new EntityNotFoundException("ÇÁ¸®¼ÂÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.")); // ¸Ş½ÃÁö º¯°æ
-            repository.deleteByPresetPromptId(presetPromptId); // ¸í½ÃÀû »èÁ¦ ¸Ş¼­µå
-        } catch (EntityNotFoundException e) {
-            throw new RuntimeException("ÇÁ¸®¼Â »èÁ¦ ½ÇÆĞ: " + e.getMessage(), e);
+            repository.findByPresetPromptId(presetPromptId) // ì‚­ì œ ì „ì— ì¡´ì¬ ì—¬ë¶€ë¥¼ í™•ì¸
+                    .orElseThrow(() -> new IllegalArgumentException("í”„ë¦¬ì…‹ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
+            repository.deleteByPresetPromptId(presetPromptId); // ëª…ì‹œì  ì‚­ì œ ë©”ì„œë“œ
         } catch (Exception e) {
-            throw new RuntimeException("ÇÁ¸®¼Â »èÁ¦ Áß ¿À·ù ¹ß»ı: " + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }

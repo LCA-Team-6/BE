@@ -1,16 +1,15 @@
-package com.project.mini.prompt.controller; // Æú´õ ±¸Á¶ º¯°æ¿¡ ¸ÂÃç controller ÇÏÀ§·Î ÀÌµ¿
+package com.project.mini.prompt.controller; // í´ë” êµ¬ì¡° ë³€ê²½ì— ë§ì¶° controller í•˜ìœ„ë¡œ ì´ë™
 
 import com.project.mini.prompt.dto.*;
-import com.project.mini.prompt.service.PresetPromptService; // service ÆĞÅ°Áö º¯°æ
-import com.project.mini.common.response.Response; // Response Å¬·¡½º ÀÓÆ÷Æ®
+import com.project.mini.prompt.service.PresetPromptService; // service íŒ¨í‚¤ì§€ ë³€ê²½
+import com.project.mini.common.response.Response; // Response í´ë˜ìŠ¤ ì„í¬íŠ¸
+import com.project.mini.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails; // Spring Security UserDetails ÀÓÆ÷Æ®
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RestController
@@ -20,88 +19,59 @@ public class PresetPromptController {
 
     private final PresetPromptService service;
 
-    // TODO: ½ÇÁ¦ Spring Security UserDetails ±¸ÇöÃ¼¿¡¼­ userId¸¦ °¡Á®¿À´Â ·ÎÁ÷À¸·Î ±³Ã¼ ÇÊ¿ä
-    // UserDetails´Â ÀÏ¹İÀûÀ¸·Î »ç¿ëÀÚÀÇ ÀÌ¸ŞÀÏÀÌ³ª ID¸¦ getUsername()À¸·Î ¹İÈ¯ÇÕ´Ï´Ù.
-    // ¿©±â¼­´Â getUsername()ÀÌ »ç¿ëÀÚ ID(Long)¸¦ ¹®ÀÚ¿­·Î ¹İÈ¯ÇÑ´Ù°í °¡Á¤ÇÕ´Ï´Ù.
-    // ¶Ç´Â CustomUserDetails¸¦ ±¸ÇöÇÏ¿© Long Å¸ÀÔÀÇ userId¸¦ Á÷Á¢ °¡Áö°Ô ÇÏ´Â °ÍÀÌ °¡Àå ÁÁ½À´Ï´Ù.
-    private Long getUserIdFromPrincipal(UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new IllegalArgumentException("ÀÎÁõµÈ »ç¿ëÀÚ Á¤º¸¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
-        }
-        // ¿¹½Ã: UserDetailsÀÇ usernameÀÌ »ç¿ëÀÚ ID¸¦ ³ªÅ¸³»´Â ¹®ÀÚ¿­ÀÌ¶ó°í °¡Á¤.
-        // ½ÇÁ¦·Î´Â User ¿£Æ¼Æ¼¿Í ¸ÅÇÎµÇ´Â userId¸¦ °¡Á®¿À´Â ·ÎÁ÷À¸·Î º¯°æÇØ¾ß ÇÕ´Ï´Ù.
-        // ¿¹¸¦ µé¾î, »ç¿ëÀÚ ÀÎÁõ °úÁ¤¿¡¼­ CustomUserDetails¸¦ »ı¼ºÇÏ°í ±× ¾È¿¡ userId¸¦ ÀúÀåÇÏ´Â ¹æ½Ä.
-        try {
-            return Long.parseLong(userDetails.getUsername()); // UserDetailsÀÇ getUsername()ÀÌ userId ¹®ÀÚ¿­ÀÌ¶ó°í °¡Á¤
-        } catch (NumberFormatException e) {
-            // userDetails.getUsername()ÀÌ ¼ıÀÚ°¡ ¾Æ´Ñ ÀÌ¸ŞÀÏ µîÀÌ¶ó¸é, ÀÌ¸ŞÀÏ·Î User ¿£Æ¼Æ¼¸¦ Á¶È¸ÇÏ¿© ID¸¦ °¡Á®¿Í¾ß ÇÕ´Ï´Ù.
-            // ¿¹: User findUser = userService.findUserByEmail(userDetails.getUsername()); return findUser.getId();
-            throw new IllegalArgumentException("»ç¿ëÀÚ ID¸¦ ÃßÃâÇÒ ¼ö ¾ø½À´Ï´Ù. (UserDetails username: " + userDetails.getUsername() + ")");
-        }
-    }
-
     @GetMapping
-    public ResponseEntity<Response<List<PresetPromptResponseDto>>> getAllPrompts(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getAllPrompts(@AuthenticationPrincipal User user) {
         try {
-            Long userId = getUserIdFromPrincipal(userDetails);
-            List<PresetPromptResponseDto> prompts = service.getAllPrompts(userId);
-            return ResponseEntity.ok(Response.success("ÇÁ¸®¼Â ¸ñ·Ï Á¶È¸ ¼º°ø", prompts));
+            List<PresetPromptResponseDto> prompts = service.getAllPrompts(user.getUserId());
+            return ResponseEntity.ok(Response.success(null, prompts));
         } catch (IllegalArgumentException e) {
-            // ÀÎÁõ Á¤º¸°¡ ¾ø°Å³ª userId ÃßÃâ ½ÇÆĞ ½Ã
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.error(HttpStatus.UNAUTHORIZED, e.getMessage()));
+            // ì¸ì¦ ì •ë³´ê°€ ì—†ê±°ë‚˜ userId ì¶”ì¶œ ì‹¤íŒ¨ ì‹œ
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.fail(HttpStatus.UNAUTHORIZED, e.getMessage()));
         } catch (Exception e) {
-            // ¼­ºñ½º °èÃş¿¡¼­ ´øÁ®Áø RuntimeException µî Ã³¸®
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR, "ÇÁ¸®¼Â ¸ñ·Ï Á¶È¸ ½ÇÆĞ: " + e.getMessage()));
+            // ì„œë¹„ìŠ¤ ê³„ì¸µì—ì„œ ë˜ì ¸ì§„ RuntimeException ë“± ì²˜ë¦¬
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.fail(HttpStatus.INTERNAL_SERVER_ERROR, "í”„ë¦¬ì…‹ ëª©ë¡ ì¡°íšŒ ì‹¤íŒ¨: " + e.getMessage()));
         }
     }
 
-    @GetMapping("/{presetPromptId}") // @PathVariable Long id ´ë½Å @PathVariable Long presetPromptId
+    @GetMapping("/{presetPromptId}")
     public ResponseEntity<Response<PresetPromptResponseDto>> getPrompt(@PathVariable Long presetPromptId) {
         try {
             PresetPromptResponseDto prompt = service.getPrompt(presetPromptId);
-            return ResponseEntity.ok(Response.success("ÇÁ¸®¼Â ´ÜÀÏ Á¶È¸ ¼º°ø", prompt));
-        } catch (EntityNotFoundException e) {
-            // ÇÁ¸®¼ÂÀÌ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.error(HttpStatus.NOT_FOUND, e.getMessage()));
+            return ResponseEntity.ok(Response.success(null, prompt));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR, "ÇÁ¸®¼Â ´ÜÀÏ Á¶È¸ ½ÇÆĞ: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.fail(HttpStatus.INTERNAL_SERVER_ERROR, "í”„ë¦¬ì…‹ ë‹¨ì¼ ì¡°íšŒ ì‹¤íŒ¨: " + e.getMessage()));
         }
     }
 
     @PostMapping
-    public ResponseEntity<Response<Void>> createPrompt(@RequestBody PresetPromptRequestDto dto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Response<Void>> createPrompt(@RequestBody PresetPromptRequestDto dto, @AuthenticationPrincipal User user) {
         try {
-            Long userId = getUserIdFromPrincipal(userDetails); // ·Î±×ÀÎÇÑ À¯ÀúÀÇ userId °¡Á®¿À±â
-            service.createPrompt(dto, userId); // userId Àü´Ş
-            return ResponseEntity.status(HttpStatus.CREATED).body(Response.success("ÇÁ¸®¼Â ÀúÀå ¼º°ø")); // 201 Created ÀÀ´ä
+            service.createPrompt(dto, user.getUserId()); // userId ì „ë‹¬
+            return ResponseEntity.ok(Response.success("í”„ë¦¬ì…‹ ì €ì¥ ì„±ê³µ", null));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.error(HttpStatus.UNAUTHORIZED, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.fail(HttpStatus.UNAUTHORIZED, e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR, "ÇÁ¸®¼Â ÀúÀå ½ÇÆĞ: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.fail(HttpStatus.INTERNAL_SERVER_ERROR, "í”„ë¦¬ì…‹ ì €ì¥ ì‹¤íŒ¨: " + e.getMessage()));
         }
     }
 
-    @PutMapping("/{presetPromptId}") // @PathVariable Long id ´ë½Å @PathVariable Long presetPromptId
+    @PutMapping("/{presetPromptId}")
     public ResponseEntity<Response<PresetPromptResponseDto>> updatePrompt(@PathVariable Long presetPromptId, @RequestBody PresetPromptRequestDto dto) {
         try {
             PresetPromptResponseDto updatedPrompt = service.updatePrompt(presetPromptId, dto);
-            return ResponseEntity.ok(Response.success("ÇÁ¸®¼Â ¼öÁ¤ ¼º°ø", updatedPrompt));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.error(HttpStatus.NOT_FOUND, e.getMessage()));
+            return ResponseEntity.ok(Response.success(null, updatedPrompt));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR, "ÇÁ¸®¼Â ¼öÁ¤ ½ÇÆĞ: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.fail(HttpStatus.INTERNAL_SERVER_ERROR, "í”„ë¦¬ì…‹ ìˆ˜ì • ì‹¤íŒ¨: " + e.getMessage()));
         }
     }
 
-    @DeleteMapping("/{presetPromptId}") // @PathVariable Long id ´ë½Å @PathVariable Long presetPromptId
+    @DeleteMapping("/{presetPromptId}")
     public ResponseEntity<Response<Void>> deletePrompt(@PathVariable Long presetPromptId) {
         try {
             service.deletePrompt(presetPromptId);
-            return ResponseEntity.ok(Response.success("ÇÁ¸®¼Â »èÁ¦ ¼º°ø"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.error(HttpStatus.NOT_FOUND, e.getMessage()));
+            return ResponseEntity.ok(Response.success("í”„ë¦¬ì…‹ ì‚­ì œ ì„±ê³µ", null));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR, "ÇÁ¸®¼Â »èÁ¦ ½ÇÆĞ: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.fail(HttpStatus.INTERNAL_SERVER_ERROR, "í”„ë¦¬ì…‹ ì‚­ì œ ì‹¤íŒ¨: " + e.getMessage()));
         }
     }
 }

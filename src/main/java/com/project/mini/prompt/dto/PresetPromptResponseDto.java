@@ -1,4 +1,4 @@
-package com.project.mini.preset.prompt.dto;
+package com.project.mini.prompt.dto;
 
 import lombok.*;
 import java.time.LocalDateTime;
