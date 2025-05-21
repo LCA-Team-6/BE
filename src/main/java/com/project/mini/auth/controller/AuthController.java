@@ -1,5 +1,6 @@
 package com.project.mini.auth.controller;
 
+import com.project.mini.auth.dto.EmailDto;
 import com.project.mini.auth.dto.LoginDto;
 import com.project.mini.auth.dto.SignUpDto;
 import com.project.mini.auth.dto.TokenDto;
@@ -64,8 +65,8 @@ public class AuthController {
     }
 
     @PostMapping("/email")
-    public ResponseEntity<?> verifyEmail(@RequestBody String email) {
-        if (userService.isEmailDuplicate(email)) {
+    public ResponseEntity<?> verifyEmail(@RequestBody EmailDto emailDto) {
+        if (userService.isEmailDuplicate(emailDto.getEmail() )) {
             return ResponseEntity
                     .badRequest()
                     .contentType(MediaType.APPLICATION_JSON)
