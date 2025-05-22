@@ -15,7 +15,6 @@ import com.project.mini.code.repository.ToneRepository;
 import com.project.mini.memos.entity.Memo;
 import com.project.mini.memos.repository.MemoRepository;
 import com.project.mini.user.entity.User;
-import io.swagger.v3.core.util.Json;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +47,7 @@ public class AnalysisService {
     public ObjectNode createMemo (AnalysisRequestDto analysisRequestDto, User user) {
         Memo memo = Memo.builder()
                 .userId(user.getUserId())
+                .title(analysisRequestDto.getTitle())
                 .memo(analysisRequestDto.getMemo())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -65,7 +64,7 @@ public class AnalysisService {
         Memo memo = memoRepository.findById(memoId)
                 .orElseThrow(() -> new RuntimeException("해당 메모가 없습니다: " + memoId));
 
-        // memo.setTitle(analysisRequestDto.getTitle());
+        memo.setTitle(analysisRequestDto.getTitle());
         memo.setMemo(analysisRequestDto.getMemo());
         memoRepository.save(memo);
 
