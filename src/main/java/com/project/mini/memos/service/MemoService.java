@@ -5,6 +5,7 @@ import com.project.mini.memos.dto.MemoResponseDto;
 import com.project.mini.memos.entity.Memo;
 import com.project.mini.memos.repository.MemoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,5 +40,16 @@ public class MemoService {
         memo.setTitle(requestDto.getTitle()); 
         Memo updated = memoRepository.save(memo);
         return new MemoResponseDto(updated);
+    }
+
+    public void deleteMemo(Long memoId, Long userId) {
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new RuntimeException("해당 메모가 없습니다."));
+
+        if (!memo.getUserId().equals(userId)) {
+            throw new AccessDeniedException("본인의 기록만 삭제할 수 있습니다.");
+        }
+
+        memoRepository.delete(memo); // feedback도 cascade로 같이 삭제됨!
     }
 }
