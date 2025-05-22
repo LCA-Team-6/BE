@@ -1,10 +1,13 @@
 package com.project.mini.memos.controller;
 
+import com.project.mini.common.response.Response;
 import com.project.mini.memos.dto.MemoRequestDto;
 import com.project.mini.memos.dto.MemoResponseDto;
 import com.project.mini.memos.service.MemoService;
+import com.project.mini.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -47,6 +50,15 @@ public class MemoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     Map.of("message", "기록 수정 실패", "error", e.getMessage())
             );
+        }
+    }
+
+    @GetMapping("/{date}")
+    public ResponseEntity<?> getMemoByDate (@PathVariable String date, @AuthenticationPrincipal User user) {
+        if (date.length() == 2) {
+            return ResponseEntity.ok(Response.success(null, memoService.getMemoByMonth(date, user.getUserId())));
+        } else {
+            return ResponseEntity.ok(Response.success(null, memoService.getMemoByDate(date, user.getUserId())));
         }
     }
 }

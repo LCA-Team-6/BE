@@ -1,11 +1,13 @@
 package com.project.mini.memos.dto;
 
 import com.project.mini.memos.entity.Memo;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
 public class MemoResponseDto {
     private Long memoId;
     private Long userId;
