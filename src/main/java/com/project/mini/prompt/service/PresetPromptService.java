@@ -58,7 +58,7 @@ public class PresetPromptService {
     }
 
     @Transactional
-    public void createPrompt(PresetPromptRequestDto dto, Long userId) { // userId 인자 추가
+    public PresetPrompt createPrompt(PresetPromptRequestDto dto, Long userId) { // userId 인자 추가
         try {
             PresetPrompt prompt = PresetPrompt.builder()
                     .userId(userId) // @AuthenticationPrincipal에서 받은 userId 설정
@@ -69,7 +69,8 @@ public class PresetPromptService {
                     .name(dto.getName())
                     .createdAt(LocalDateTime.now()) // createdAt 설정
                     .build();
-            repository.save(prompt);
+            return repository.save(prompt);
+
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

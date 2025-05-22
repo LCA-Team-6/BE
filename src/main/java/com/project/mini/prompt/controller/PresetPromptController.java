@@ -1,6 +1,7 @@
 package com.project.mini.prompt.controller; // 폴더 구조 변경에 맞춰 controller 하위로 이동
 
 import com.project.mini.prompt.dto.*;
+import com.project.mini.prompt.entity.PresetPrompt;
 import com.project.mini.prompt.service.PresetPromptService; // service 패키지 변경
 import com.project.mini.common.response.Response; // Response 클래스 임포트
 import com.project.mini.user.entity.User;
@@ -44,10 +45,9 @@ public class PresetPromptController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<Void>> createPrompt(@RequestBody PresetPromptRequestDto dto, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Response<PresetPrompt>> createPrompt(@RequestBody PresetPromptRequestDto dto, @AuthenticationPrincipal User user) {
         try {
-            service.createPrompt(dto, user.getUserId()); // userId 전달
-            return ResponseEntity.ok(Response.success("프리셋 저장 성공", null));
+            return ResponseEntity.ok(Response.success("프리셋 저장 성공", service.createPrompt(dto, user.getUserId())));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.fail(HttpStatus.UNAUTHORIZED, e.getMessage()));
         } catch (Exception e) {
