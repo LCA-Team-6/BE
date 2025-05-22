@@ -5,6 +5,7 @@ import com.project.mini.memos.dto.MemoRequestDto;
 import com.project.mini.memos.dto.MemoResponseDto;
 import com.project.mini.memos.entity.Memo;
 import com.project.mini.memos.repository.MemoRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class MemoService {
-
     private final MemoRepository memoRepository;
-
-    @Autowired
-    public MemoService(MemoRepository memoRepository) {
-        this.memoRepository = memoRepository;
-    }
 
     public MemoResponseDto saveMemo(MemoRequestDto requestDto, Long userId) {
         Memo memo = Memo.builder()

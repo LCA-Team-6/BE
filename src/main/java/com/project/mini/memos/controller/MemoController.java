@@ -5,6 +5,7 @@ import com.project.mini.memos.dto.MemoRequestDto;
 import com.project.mini.memos.dto.MemoResponseDto;
 import com.project.mini.memos.service.MemoService;
 import com.project.mini.user.entity.User;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,14 +16,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/memos")
+@AllArgsConstructor
 public class MemoController {
-
     private final MemoService memoService;
-
-    @Autowired
-    public MemoController(MemoService memoService) {
-        this.memoService = memoService;
-    }
 
     // 기록 저장
     @PostMapping
