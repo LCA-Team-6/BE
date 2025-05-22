@@ -70,4 +70,10 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+        public Long getUserIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일의 사용자를 찾을 수 없습니다."))
+                .getUserId(); // 혹은 getId()
+    }
 }
