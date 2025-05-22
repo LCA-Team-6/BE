@@ -8,9 +8,6 @@ import com.project.mini.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import com.project.mini.user.service.UserService;
-import com.project.mini.auth.util.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
