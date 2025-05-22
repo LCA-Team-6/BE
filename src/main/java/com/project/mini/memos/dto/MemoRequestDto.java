@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class MemoRequestDto {
     private Long userId;
+    private String title;
     private String memo;
 }
