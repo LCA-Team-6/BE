@@ -4,10 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.project.mini.analysis.entity.Analysis;
 
 @Entity
 @Table(name = "memo")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -29,4 +34,8 @@ public class Memo {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "memo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Analysis> analysisList = new ArrayList<>();
+
 }
