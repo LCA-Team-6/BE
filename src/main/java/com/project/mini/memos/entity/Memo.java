@@ -21,6 +21,9 @@ public class Memo {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(nullable = false, length = 255)
+    private String title;
+
     @Column(nullable = false, length = 5000)
     private String memo;
 

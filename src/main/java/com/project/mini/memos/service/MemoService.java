@@ -22,6 +22,7 @@ public class MemoService {
     public MemoResponseDto saveMemo(MemoRequestDto requestDto) {
         Memo memo = Memo.builder()
                 .userId(requestDto.getUserId())
+                .title(requestDto.getTitle())
                 .memo(requestDto.getMemo())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -35,6 +36,7 @@ public class MemoService {
                 .orElseThrow(() -> new RuntimeException("해당 메모가 없습니다: " + memoId));
 
         memo.setMemo(requestDto.getMemo());
+        memo.setTitle(requestDto.getTitle()); 
         Memo updated = memoRepository.save(memo);
         return new MemoResponseDto(updated);
     }
