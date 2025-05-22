@@ -23,9 +23,9 @@ public class MemoService {
         this.memoRepository = memoRepository;
     }
 
-    public MemoResponseDto saveMemo(MemoRequestDto requestDto) {
+    public MemoResponseDto saveMemo(MemoRequestDto requestDto, Long userId) {
         Memo memo = Memo.builder()
-                .userId(requestDto.getUserId())
+                .userId(userId)
                 .title(requestDto.getTitle())
                 .memo(requestDto.getMemo())
                 .createdAt(LocalDateTime.now())

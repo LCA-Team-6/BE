@@ -21,21 +21,17 @@ import java.util.Map;
 public class MemoController {
 
     private final MemoService memoService;
-    private final JwtUtil jwtUtil;
-    private final UserService userService; //
 
     @Autowired
-    public MemoController(MemoService memoService, JwtUtil jwtUtil, UserService userService) {
+    public MemoController(MemoService memoService) {
         this.memoService = memoService;
-        this.jwtUtil = jwtUtil;
-        this.userService = userService;
     }
 
     // 기록 저장
     @PostMapping
-    public ResponseEntity<?> saveMemo(@RequestBody MemoRequestDto requestDto) {
+    public ResponseEntity<?> saveMemo(@RequestBody MemoRequestDto requestDto, @AuthenticationPrincipal User user) {
         try {
-            MemoResponseDto saved = memoService.saveMemo(requestDto);
+            MemoResponseDto saved = memoService.saveMemo(requestDto, user.getUserId());
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     Map.of("message", "기록 저장 성공!", "memoId", saved.getMemoId()));
         } catch (Exception e) {
@@ -68,29 +64,13 @@ public class MemoController {
 
     // 기록 삭제
     @DeleteMapping("/{memoId}")
-    public ResponseEntity<?> deleteMemo(@PathVariable Long memoId, HttpServletRequest request) {
+    public ResponseEntity<?> deleteMemo(@PathVariable Long memoId, @AuthenticationPrincipal User user) {
         try {
-            String authHeader = request.getHeader("Authorization");
-
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "인증 토큰이 없습니다."));
-            }
-
-
-            String token = authHeader.substring(7);
-            String email = jwtUtil.getEmailFromToken(token);
-
-            Long userId = userService.getUserIdByEmail(email); 
-
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "토큰에서 사용자 정보를 읽을 수 없습니다."));
-            }
+            Long userId = user.getUserId();
 
             memoService.deleteMemo(memoId, userId);
 
-            return ResponseEntity.ok(Map.of("message", "기록 삭제 성공!"));
+            return ResponseEntity.ok(Response.success("기록 삭제 성공!", null));
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "삭제 권한이 없습니다.", "error", e.getMessage()));
