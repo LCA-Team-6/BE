@@ -2,6 +2,7 @@ package com.project.mini.analysis.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.project.mini.analysis.dto.*;
 import com.project.mini.analysis.entity.Analysis;
 import com.project.mini.analysis.entity.AnalysisTag;
@@ -11,6 +12,10 @@ import com.project.mini.code.repository.ContentRepository;
 import com.project.mini.code.repository.PersonalityRepository;
 import com.project.mini.code.repository.StyleRepository;
 import com.project.mini.code.repository.ToneRepository;
+import com.project.mini.memos.entity.Memo;
+import com.project.mini.memos.repository.MemoRepository;
+import com.project.mini.user.entity.User;
+import io.swagger.v3.core.util.Json;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -33,12 +38,39 @@ public class AnalysisService {
     private final ToneRepository toneRepository;
     private final AnalysisRepository analysisRepository;
     private final AnalysisTagRepository analysisTagRepository;
+    private final MemoRepository memoRepository;
 
     @Value("${openai.api.url}")
     private String API_URL;
 
     @Value("${openai.api.key}")
     private String API_KEY;
+
+    public ObjectNode createMemo (AnalysisRequestDto analysisRequestDto, User user) {
+        Memo memo = Memo.builder()
+                .userId(user.getUserId())
+                .memo(analysisRequestDto.getMemo())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        memoRepository.save(memo);
+
+        ObjectNode analysis = (ObjectNode) getAnalysis(analysisRequestDto);
+        analysis.put("memoId", memo.getMemoId());
+
+        return analysis;
+    }
+
+    public JsonNode modifyMemo (AnalysisRequestDto analysisRequestDto, Long memoId) {
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new RuntimeException("해당 메모가 없습니다: " + memoId));
+
+        // memo.setTitle(analysisRequestDto.getTitle());
+        memo.setMemo(analysisRequestDto.getMemo());
+        memoRepository.save(memo);
+
+        return getAnalysis(analysisRequestDto);
+    }
 
     public JsonNode getAnalysis (AnalysisRequestDto analysisRequestDto) {
         RestTemplate restTemplate = new RestTemplate();
