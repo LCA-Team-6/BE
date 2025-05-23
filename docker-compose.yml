@@ -1,0 +1,11 @@
+services:
+  app:
+    container_name: feelysis-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: always

@@ -14,11 +14,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-//        if (List.of(env.getActiveProfiles()).contains("prod")) {
-//            config.setAllowedOrigins(List.of("http://localhost:3000")); // 프론트 도메인 추후 설정
-//        } else {
-            config.setAllowedOriginPatterns(List.of("*")); // 테스트용 origin 전체 허용
-//        }
+        config.setAllowedOriginPatterns(List.of("https://feelysis.murkui.com"));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
