@@ -32,7 +32,7 @@ public class AnalysisController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody AnalysisSaveDto analysisSaveDto) {
+    public ResponseEntity<?> save(@RequestBody AnalysisSaveDto analysisSaveDto, @AuthenticationPrincipal User user) {
         analysisService.save(analysisSaveDto);
         return ResponseEntity.ok(Response.success("피드백 저장을 완료했습니다.", null));
     }
